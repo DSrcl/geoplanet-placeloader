@@ -1,0 +1,4 @@
+{
+    "dsn": "root@/news", // dsn for accessing mysql
+    "input": "" // path to places.tsv, which can be downloaded here https://drive.google.com/file/d/0BzePFkduHxhRT0N3WS1QQ0lyVGM/view?usp=sharing
+}
