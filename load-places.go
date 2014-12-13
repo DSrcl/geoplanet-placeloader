@@ -107,7 +107,6 @@ func main() {
 	}
 
 	if counter%VAL_COUNT > 0 {
-		fmt.Println(counter % VAL_COUNT)
 		dbExecAndCheck(db,
 			getInsertStmt(counter%VAL_COUNT),
 			vals...)
