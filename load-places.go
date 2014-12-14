@@ -13,11 +13,13 @@ import (
 )
 
 const (
-	DROP_STMT   string = "DROP TABLE IF EXISTS place"
-	CREATE_STMT string = `
+	DROP_STMT   = "DROP TABLE IF EXISTS place"
+	CREATE_STMT = `
 	CREATE TABLE place (
 		woeid INT,
-		name VARCHAR(500),
+		admin1 VARCHAR(100),
+		admin2 VARCHAR(100),
+		admin3 VARCHAR(100),
 		swlat FLOAT,
 		swlng FLOAT,
 		nelat FLOAT,
@@ -25,12 +27,17 @@ const (
 		PRIMARY KEY(woeid)
 	)	
 	`
-	INDEX_STMT string = `
+	COORD_INDEX_STMT = `
 	CREATE INDEX coord
 	ON place (swlat, swlng, nelat, nelng);
 	`
-	INSERT_STMT string = "INSERT IGNORE INTO place (woeid, name, swlat, swlng, nelat, nelng) VALUES "
-	VAL_COUNT   int    = 10000
+	NAME_INDEX_STMT = `
+	CREATE INDEX place_name
+	ON place (admin1, admin2, admin3);
+	`
+	INSERT_STMT = "INSERT IGNORE INTO place (woeid, admin1, admin2, admin3, swlat, swlng, nelat, nelng) VALUES "
+	VAL_COUNT   = 5000
+	FIELD_COUNT = 8
 )
 
 type Config struct {
@@ -51,7 +58,7 @@ func dbExecAndCheck(db *sql.DB, stmt string, args ...interface{}) {
 func getInsertStmt(insertCount int) string {
 	placeHolders := make([]string, insertCount)
 	for i := range placeHolders {
-		placeHolders[i] = "(?,?,?,?,?,?)"
+		placeHolders[i] = "(?,?,?,?,?,?,?,?)"
 	}
 
 	return INSERT_STMT + strings.Join(placeHolders, ",")
@@ -73,7 +80,8 @@ func main() {
 
 	dbExecAndCheck(db, DROP_STMT)
 	dbExecAndCheck(db, CREATE_STMT)
-	dbExecAndCheck(db, INDEX_STMT)
+	dbExecAndCheck(db, COORD_INDEX_STMT)
+	dbExecAndCheck(db, NAME_INDEX_STMT)
 
 	f, err := os.Open(config.Input)
 	defer f.Close()
@@ -82,7 +90,7 @@ func main() {
 	reader := bufio.NewReader(f)
 	scanner := bufio.NewScanner(reader)
 	counter := 0
-	vals := make([]interface{}, 0, VAL_COUNT*6)
+	vals := make([]interface{}, 0, VAL_COUNT*FIELD_COUNT)
 
 	fmt.Println("loading geodata into database...")
 	for scanner.Scan() {
@@ -90,18 +98,21 @@ func main() {
 			dbExecAndCheck(db,
 				getInsertStmt(VAL_COUNT),
 				vals...)
-			vals = make([]interface{}, 0, VAL_COUNT*6)
+			vals = make([]interface{}, 0, VAL_COUNT*FIELD_COUNT)
 		}
 
-		placeData := strings.Split(scanner.Text(), "\t")
-		if len(placeData) == 6 {
+		placeData := strings.Split(scanner.Text(), ",")
+		if len(placeData) == FIELD_COUNT {
 			vals = append(vals,
 				placeData[0],
 				placeData[1],
 				placeData[2],
 				placeData[3],
 				placeData[4],
-				placeData[5])
+				placeData[5],
+				placeData[6],
+				placeData[7],
+			)
 			counter++
 		}
 	}
@@ -113,5 +124,4 @@ func main() {
 	}
 
 	fmt.Println("Finished. Loaded", counter, "places...")
-
 }
