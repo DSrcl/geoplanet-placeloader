@@ -17,14 +17,15 @@ const (
 	CREATE_STMT = `
 	CREATE TABLE place (
 		woeid INT,
-		admin1 VARCHAR(100),
-		admin2 VARCHAR(100),
-		admin3 VARCHAR(100),
+		admin1 VARCHAR(80),
+		admin2 VARCHAR(80),
+		admin3 VARCHAR(80),
 		swlat FLOAT,
 		swlng FLOAT,
 		nelat FLOAT,
 		nelng FLOAT,
-		PRIMARY KEY(woeid)
+		PRIMARY KEY(woeid),
+		UNIQUE (admin1, admin2, admin3)
 	)	
 	`
 	COORD_INDEX_STMT = `
