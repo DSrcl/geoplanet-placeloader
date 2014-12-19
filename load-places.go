@@ -68,7 +68,7 @@ func getInsertStmt(insertCount int) string {
 func main() {
 	curDir, err := os.Getwd()
 	check(err)
-	configLoc := filepath.Join(curDir, "db.conf")
+	configLoc := filepath.Join(curDir, "db.json")
 
 	configFile, err := ioutil.ReadFile(configLoc)
 	check(err)

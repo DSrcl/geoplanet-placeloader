@@ -1,0 +1,4 @@
+{
+    "dsn": "root@/news",
+    "input": "/Users/tom/workspace/go/load-places/places.tsv"
+}
