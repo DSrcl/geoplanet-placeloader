@@ -1,4 +1,4 @@
 {
     "dsn": "root@/news", // dsn for accessing mysql
-    "input": "places.tsv" // path to places.tsv
+    "input": "places.tsv" // path to places.csv
 }
